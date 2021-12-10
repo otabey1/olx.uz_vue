@@ -9,6 +9,7 @@ mysqlclient = "*"
 django-environ = "*"
 djangorestframework = "*"
 django-filter = "*"
+pytz = "*"
 
 [dev-packages]
 
