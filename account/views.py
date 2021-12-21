@@ -1,26 +1,49 @@
+from django.contrib.auth import authenticate
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-
-from .models import User
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, LoginSerializers, ProfileSerializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 
 
-class RegistrationAPIView(APIView):
+class RegistrationAPIView(CreateAPIView):
+    permission_classes = [~IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = RegistrationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                "status": "fail",
+                "data": serializer.errors
+                })
+        serializer.save()
+        return Response({
+            "status": "success"
+        })
+
+
+class LoginApiView(APIView):
     permission_classes = [~IsAuthenticated]
 
     def post(self, request):
-        data = RegistrationSerializer(data=request.data)
-        if not data.is_valid():
+        serializers = LoginSerializers(data=request.data)
+        if not serializers.is_valid():
+            Response({"status": "fail", "data": serializers.errors})
+
+        user = authenticate(request, **serializers.validated_data)
+        if user is None:
             return Response({
                 "status": "fail",
-                "data": data.errors
+                "data": "Login va/yoki parol noto'g'ri"
             })
-        user = data.save()
-        user.set_password(data.validated_data.get('password'))
-        user.save()
 
+        token, created = Token.objects.get_or_create(user=user)
         return Response({
-            "status": "success"
+            "status": "success",
+            "data": {
+                "user": ProfileSerializers(user).data,
+                "token": token.key
+            }
         })
