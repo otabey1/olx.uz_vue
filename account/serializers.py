@@ -10,7 +10,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
-            email=validated_data['email']
         )
         return user
 
@@ -25,18 +24,25 @@ class RegistrationSerializer(serializers.ModelSerializer):
                     MinLengthValidator(5)
                 ]
             },
-            'email': {
+            'password': {
                 'required': True,
                 'validators': [
-                    MaxLengthValidator(200)
+                    MaxLengthValidator(100),
+                    MinLengthValidator(6)
                 ]
-            }
+            },
         }
 
 
 class LoginSerializers(serializers.Serializer):
     username = serializers.CharField(max_length=50, min_length=5,  required=True)
     password = serializers.CharField(max_length=100, min_length=0, required=True)
+
+
+class MeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'last_name', 'first_name', 'email', )
 
 
 class ProfileSerializers(serializers.ModelSerializer):

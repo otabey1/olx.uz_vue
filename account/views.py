@@ -3,9 +3,18 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from .serializers import RegistrationSerializer, LoginSerializers, ProfileSerializers
+from .serializers import RegistrationSerializer, LoginSerializers, ProfileSerializers, MeSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
+
+
+class MeAPIView(APIView):
+    def get(self, request):
+        print(1)
+        return Response({
+            "status": "success",
+            'data': MeSerializer(request.user).data
+        })
 
 
 class RegistrationAPIView(CreateAPIView):

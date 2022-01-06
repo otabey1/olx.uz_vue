@@ -1,3 +1,5 @@
 from django.db import models
+from config.mixins import TranslateMixin
 
-# Create your models here.
+# class Country(models.Model, TranslateMixin):
+#     name
